@@ -29,7 +29,7 @@ namespace LineBotCrawler
                 ExecuteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                 //結束後關閉視窗
                 _lifeTime.StopApplication();
-            });
+            }, cancellationToken);
             return Task.CompletedTask;
         }
 

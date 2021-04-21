@@ -7,7 +7,8 @@ using System;
 
 namespace LineBotCrawler
 {
-    class Program
+    
+    public class Program
     {
         public static void Main(string[] args)
         {
