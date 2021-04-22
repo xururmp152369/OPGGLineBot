@@ -27,6 +27,8 @@ namespace LineBotCrawler
             {
                 //使用新執行續執行
                 ExecuteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                //可以用 Console.WriteLine 輸出 Log
+                Console.WriteLine("Finish!!");
                 //結束後關閉視窗
                 _lifeTime.StopApplication();
             }, cancellationToken);
@@ -35,9 +37,9 @@ namespace LineBotCrawler
 
         public async Task ExecuteAsync()
         {
-            var championState = await _db.ChampionState.FirstOrDefaultAsync();
+            //var championState = await _db.ChampionState.FirstOrDefaultAsync();
 
-            Console.WriteLine($"{championState.CpPosition} {championState.CpName}");
+            //Console.WriteLine($"{championState.CpPosition} {championState.CpName}");
         }
 
 

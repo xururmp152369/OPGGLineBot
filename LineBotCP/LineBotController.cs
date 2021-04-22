@@ -49,5 +49,11 @@ namespace LineBotCP
             }
             return Ok();
         }
+
+        [HttpGet("wakeUp")]
+        public string WakeUp()
+        {
+            return "I wake up!!";
+        }
     }
 }
