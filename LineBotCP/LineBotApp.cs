@@ -45,12 +45,10 @@ namespace LineBotCP
                                 //新增一筆資料
                                 var championState = new ChampionState
                                 {
-                                    CpPosition = "上路",
-                                    CpState = 1,
                                     CpName = $"{match.Value}",
-                                    CpWinrate = "50.83%",
-                                    CpPickrate = "14.96%",
-                                    CpTier = "1"
+                                    CpNameEn = "Test",
+                                    CpUrl = "http://test",
+                                    CpPosition = "上路"
                                 };
                                 _db.ChampionState.Add(championState);
                                 await _db.SaveChangesAsync();
