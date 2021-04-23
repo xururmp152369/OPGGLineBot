@@ -24,7 +24,7 @@ namespace LineBotCP
         {
             services.AddDbContext<CoreDbContext>(options =>
             {
-                options.UseMySQL(Configuration.GetConnectionString("SQLConnectionString"));
+                options.UseMySql(Configuration.GetConnectionString("SQLConnectionString"));
             });
 
             services.AddSingleton<LineBotConfig, LineBotConfig>((s) => new LineBotConfig

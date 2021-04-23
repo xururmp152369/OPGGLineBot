@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System;
 
 namespace LineBotCrawler
@@ -27,7 +28,15 @@ namespace LineBotCrawler
                 //將 CoreDbContext 註冊 DI
                 services.AddDbContext<CoreDbContext>(options =>
                 {
-                    options.UseMySQL(hostContext.Configuration.GetConnectionString("SQLConnectionString"));
+                    options.UseMySql(hostContext.Configuration.GetConnectionString("SQLConnectionString"),
+                        mySqlOptions =>
+                        {
+                            mySqlOptions.ServerVersion(new Version(5, 7, 17), ServerType.MySql)
+                            .EnableRetryOnFailure(
+                            maxRetryCount: 10,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                        });
                 });
                 services.AddHostedService<Worker>();
             });
