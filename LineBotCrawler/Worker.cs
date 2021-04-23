@@ -4,7 +4,9 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,6 +37,11 @@ namespace LineBotCrawler
             return Task.CompletedTask;
         }
 
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
         public async Task ExecuteAsync()
         {
             //var championState = await _db.ChampionState.FirstOrDefaultAsync();
@@ -42,10 +49,15 @@ namespace LineBotCrawler
             //Console.WriteLine($"{championState.CpPosition} {championState.CpName}");
         }
 
-
-        public Task StopAsync(CancellationToken cancellationToken)
+        private async Task<List<(string CpName, string CpNameEn, string CpUrl, string CpPosition)>> GetCpInfo(HttpClient httpClient, string url)
         {
-            return Task.CompletedTask;
+            var html = await httpClient.GetStringAsync(url);
+            // ""><i) 抓取URL
+            var matches = Regex.Matches(html, @"");
+            return;
         }
     }
 }
+/*
+ 
+ */
