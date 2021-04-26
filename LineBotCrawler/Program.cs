@@ -25,19 +25,15 @@ namespace LineBotCrawler
             })
             .ConfigureServices((hostContext, services) =>
             {
-                //將 CoreDbContext 註冊 DI
-                services.AddDbContext<CoreDbContext>(options =>
-                {
-                    options.UseMySql(hostContext.Configuration.GetConnectionString("SQLConnectionString"),
-                        mySqlOptions =>
-                        {
-                            mySqlOptions.ServerVersion(new Version(5, 7, 17), ServerType.MySql)
-                            .EnableRetryOnFailure(
-                            maxRetryCount: 10,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: null);
-                        });
-                });
+                var serverVersion = new MySqlServerVersion(new Version(8, 0, 21));
+
+                // Replace 'YourDbContext' with the name of your own DbContext derived class.
+                services.AddDbContextPool<CoreDbContext>(
+                    dbContextOptions => dbContextOptions
+                        .UseMySql(hostContext.Configuration.GetConnectionString("SQLConnectionString"), serverVersion)
+                        .EnableSensitiveDataLogging() // These two calls are optional but help
+                        .EnableDetailedErrors()       // with debugging (remove for production).
+                );
                 services.AddHostedService<Worker>();
             });
     }
