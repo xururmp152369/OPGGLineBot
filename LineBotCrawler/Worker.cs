@@ -70,6 +70,7 @@ namespace LineBotCrawler
                     };
                     _db.ChampionState.Add(championState);
                     ChampionStateDictionary.Add(championState.CpName, championState);
+                    Console.WriteLine("insert success");
                 }
                 //更新
                 else
@@ -78,9 +79,10 @@ namespace LineBotCrawler
                     championState.CpNameEn = cpState.CpNameEn;
                     championState.CpPosition = cpState.CpPosition;
                     championState.CpUrl = cpState.CpUrl;
+                    Console.WriteLine("update success");
                 }
             }
-            await _db.SaveChangesAsync(true);
+            await _db.SaveChangesAsync();
 
             //var championState = new ChampionState
             //{
@@ -107,7 +109,7 @@ namespace LineBotCrawler
                 var CpUrl = it.Groups[3].Value.Trim();
                 var CpPosition = "";
                 MatchCollection matches_lane = Regex.Matches(it.Groups[4].Value, @"(?<=span>)([\u4e00-\u9fa5]+)");
-                foreach (Match m in matches)
+                foreach (Match m in matches_lane)
                     CpPosition = String.Concat(CpPosition, String.Concat(" ", m.Value.Trim()));
                 return (CpName, CpNameEn, CpUrl, CpPosition);
             })
