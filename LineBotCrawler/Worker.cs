@@ -17,7 +17,7 @@ namespace LineBotCrawler
     {
         private readonly IHostApplicationLifetime _lifeTime;
         private readonly CoreDbContext _db;
-        private string OPGG_CP_Info_url = "http://www.op.gg/champion/statistics";
+        private string OPGG_CP_Info_url = "http://tw.op.gg/champion/statistics";
 
         public Worker(IHostApplicationLifetime lifeTime, CoreDbContext db)
         {
