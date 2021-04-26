@@ -111,6 +111,7 @@ namespace LineBotCrawler
                 MatchCollection matches_lane = Regex.Matches(it.Groups[4].Value, @"(?<=span>)([\u4e00-\u9fa5]+)");
                 foreach (Match m in matches_lane)
                     CpPosition = String.Concat(CpPosition, String.Concat(" ", m.Value.Trim()));
+                Console.WriteLine(CpName + "+" + CpNameEn + "+" + CpUrl + "+" + CpPosition);
                 return (CpName, CpNameEn, CpUrl, CpPosition);
             })
             .ToList();
