@@ -17,7 +17,7 @@ namespace LineBotCrawler
     {
         private readonly IHostApplicationLifetime _lifeTime;
         private readonly CoreDbContext _db;
-        private string OPGG_CP_Info_url = "http://tw.op.gg/champion/statistics";
+        private string OPGG_CP_Info_url = "http://www.op.gg/champion/statistics";
 
         public Worker(IHostApplicationLifetime lifeTime, CoreDbContext db)
         {
@@ -108,7 +108,7 @@ namespace LineBotCrawler
                 var CpNameEn = it.Groups[2].Value.Trim();
                 var CpUrl = it.Groups[3].Value.Trim();
                 var CpPosition = "";
-                MatchCollection matches_lane = Regex.Matches(it.Groups[4].Value, @"(?<=span>)([\u4e00-\u9fa5]+)");
+                MatchCollection matches_lane = Regex.Matches(it.Groups[4].Value, @"(?<=span>)([\w]+)");
                 foreach (Match m in matches_lane)
                     CpPosition = String.Concat(CpPosition, String.Concat(" ", m.Value.Trim()));
                 Console.WriteLine(CpName + "+" + CpNameEn + "+" + CpUrl + "+" + CpPosition);
