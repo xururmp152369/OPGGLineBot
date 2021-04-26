@@ -80,7 +80,7 @@ namespace LineBotCrawler
                     championState.CpUrl = cpState.CpUrl;
                 }
             }
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(true);
 
             //var championState = new ChampionState
             //{
