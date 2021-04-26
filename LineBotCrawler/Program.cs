@@ -30,9 +30,13 @@ namespace LineBotCrawler
                 // Replace 'YourDbContext' with the name of your own DbContext derived class.
                 services.AddDbContextPool<CoreDbContext>(
                     dbContextOptions => dbContextOptions
-                        .UseMySql(hostContext.Configuration.GetConnectionString("SQLConnectionString"), serverVersion)
+                        .UseMySql(hostContext.Configuration.GetConnectionString("SQLConnectionString"), serverVersion, options =>
+                        {
+                            options.EnableRetryOnFailure();
+                        })
                         .EnableSensitiveDataLogging() // These two calls are optional but help
                         .EnableDetailedErrors()       // with debugging (remove for production).
+                        
                 );
                 services.AddHostedService<Worker>();
             });
