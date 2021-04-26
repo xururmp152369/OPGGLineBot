@@ -46,7 +46,7 @@ namespace LineBotCrawler
 
         public async Task ExecuteAsync()
         {
-            /*using var httpClient = new HttpClient();
+            using var httpClient = new HttpClient();
 
             //從 DB 取得所有英雄名稱
             var ChampionStateDictionary = await _db.ChampionState
@@ -80,18 +80,19 @@ namespace LineBotCrawler
                     championState.CpUrl = championState.CpUrl;
                 }
             }
-            await _db.SaveChangesAsync();*/
-            var championState = new ChampionState
-            {
-                CpName = "測試",
-                CpNameEn = "Test",
-                CpUrl = "http://test",
-                CpPosition = "上路"
-            };
-            _db.ChampionState.Add(championState);
             await _db.SaveChangesAsync();
-            //可以用 Console.WriteLine 輸出 Log
-            Console.WriteLine("DB!!");
+
+            //var championState = new ChampionState
+            //{
+            //    CpName = "測試",
+            //    CpNameEn = "Test",
+            //    CpUrl = "http://test",
+            //    CpPosition = "上路"
+            //};
+            //_db.ChampionState.Add(championState);
+            //await _db.SaveChangesAsync();
+            ////可以用 Console.WriteLine 輸出 Log
+            //Console.WriteLine("DB!!");
         }
 
         private async Task<List<(string CpName, string CpNameEn, string CpUrl, string CpPosition)>> GetCpInfo(HttpClient httpClient, string url)
