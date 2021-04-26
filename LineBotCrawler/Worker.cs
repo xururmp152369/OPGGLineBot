@@ -74,10 +74,10 @@ namespace LineBotCrawler
                 //更新
                 else
                 {
-                    championState.CpName = championState.CpName;
-                    championState.CpNameEn = championState.CpNameEn;
-                    championState.CpPosition = championState.CpPosition;
-                    championState.CpUrl = championState.CpUrl;
+                    championState.CpName = cpState.CpName;
+                    championState.CpNameEn = cpState.CpNameEn;
+                    championState.CpPosition = cpState.CpPosition;
+                    championState.CpUrl = cpState.CpUrl;
                 }
             }
             await _db.SaveChangesAsync();
