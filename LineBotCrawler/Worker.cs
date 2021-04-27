@@ -99,10 +99,8 @@ namespace LineBotCrawler
 
         private async Task<List<(string CpName, string CpNameEn, string CpUrl, string CpPosition)>> GetCpInfo(HttpClient httpClient, string url)
         {
-            var response = await httpClient.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            response.Content.Headers.ContentType.CharSet = "zh_TW";
-            var html = await response.Content.ReadAsStringAsync();
+            httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-TW,zh;q=0.9");
+            var html = await httpClient.GetStringAsync(url);
 
             // ""><i) 抓取URL
             var matches = Regex.Matches(html, @"(?<=data-champion-name="")([^""]*)[\s\S]*?(?<=data-champion-key="")([^""]*)[\s\S]*?(?<=href="")([^""]*)[\s\S]*?champion-index__champion-item__positions""><div class=""champion-index__champion-item__position"">(.*?)<\/a>");
@@ -114,7 +112,7 @@ namespace LineBotCrawler
                 var CpPosition = "";
                 MatchCollection matches_lane = Regex.Matches(it.Groups[4].Value, @"(?<=span>)([\u4E00-\u9FFF]+)");
                 foreach (Match m in matches_lane)
-                    CpPosition = String.Concat(CpPosition, String.Concat(" ", m.Value.Trim()));
+                    CpPosition = String.Concat(CpPosition, String.Concat(" ", m.Value));
                 Console.WriteLine(CpName + "+" + CpNameEn + "+" + CpUrl + "+" + CpPosition);
                 return (CpName, CpNameEn, CpUrl, CpPosition);
             })
