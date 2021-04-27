@@ -9,7 +9,7 @@ namespace LinBotDBClass.Models
         public int Id { get; set; }
         public string CpName { get; set; }
         public string CpNameEn { get; set; }
-        public string CpUrl { get; set; }
+        public string CpUri { get; set; }
         public string CpPosition { get; set; }
     }
 }

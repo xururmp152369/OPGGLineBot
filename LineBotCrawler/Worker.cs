@@ -66,7 +66,7 @@ namespace LineBotCrawler
                         CpName = cpState.CpName,
                         CpNameEn = cpState.CpNameEn,
                         CpPosition = cpState.CpPosition,
-                        CpUrl = cpState.CpUrl
+                        CpUri = cpState.CpUri
                     };
                     _db.ChampionState.Add(championState);
                     ChampionStateDictionary.Add(championState.CpName, championState);
@@ -78,7 +78,7 @@ namespace LineBotCrawler
                     championState.CpName = cpState.CpName;
                     championState.CpNameEn = cpState.CpNameEn;
                     championState.CpPosition = cpState.CpPosition;
-                    championState.CpUrl = cpState.CpUrl;
+                    championState.CpUri = cpState.CpUri;
                     Console.WriteLine("update success");
                 }
             }
@@ -88,7 +88,7 @@ namespace LineBotCrawler
             //{
             //    CpName = "測試",
             //    CpNameEn = "Test",
-            //    CpUrl = "http://test",
+            //    CpUri = "http://test",
             //    CpPosition = "上路"
             //};
             //_db.ChampionState.Add(championState);
@@ -97,24 +97,40 @@ namespace LineBotCrawler
             //Console.WriteLine("DB!!");
         }
 
-        private async Task<List<(string CpName, string CpNameEn, string CpUrl, string CpPosition)>> GetCpInfo(HttpClient httpClient, string url)
+        private async Task<List<(string CpName, string CpNameEn, string CpUri, string CpPosition)>> GetCpInfo(HttpClient httpClient, string url)
         {
             httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh_TW,zh;q=0.9");
             var html = await httpClient.GetStringAsync(url);
 
             // ""><i) 抓取URL
-            var matches = Regex.Matches(html, @"(?<=data-champion-name="")([^""]*)[\s\S]*?(?<=data-champion-key="")([^""]*)[\s\S]*?(?<=href="")([^""]*)[\s\S]*?champion-index__champion-item__positions""><div class=""champion-index__champion-item__position"">(.*?)<\/a>");
+            var matches = Regex.Matches(html, @"(?<=data-champion-name="")([^""]*)[\s\S]*?(?<=data-champion-key="")([^""]*)([\s\S]*?)(?=<\/div><\/div)");
             return matches.ToList().Select(it =>
             {
                 var CpName = it.Groups[1].Value;
                 var CpNameEn = it.Groups[2].Value;
-                var CpUrl = it.Groups[3].Value;
+                var CpUri = "";
                 var CpPosition = "";
-                MatchCollection matches_lane = Regex.Matches(it.Groups[4].Value, @"(?<=span>)([\u4E00-\u9FFF]+)");
-                foreach (Match m in matches_lane)
-                    CpPosition = String.Concat(CpPosition, String.Concat(" ", m.Value));
-                Console.WriteLine(CpName + "+" + CpNameEn + "+" + CpUrl + "+" + CpPosition);
-                return (CpName, CpNameEn, CpUrl, CpPosition);
+
+                MatchCollection matches_rip = Regex.Matches(it.Groups[3].Value, @"(?<=alt="")([^""]*)?");
+
+                if(matches_rip[0].Value == "R.I.P")
+                {
+                    CpUri = "No Data";
+                    CpPosition = "No Data";
+                }
+                else
+                {
+                    MatchCollection matches_uri = Regex.Matches(it.Groups[3].Value, @"(?<=href="")([^""]*)[\s\S]*?(?<=champion-index__champion-item__positions"">)([\s\S]*)?");
+                    foreach (Match uri in matches_uri)
+                    {
+                        GroupCollection groups = uri.Groups;
+                        CpUri = groups[1].Value;
+                        MatchCollection matches_lane = Regex.Matches(groups[2].Value, @"(?<=span>)([\u4E00-\u9FFF]+)");
+                        foreach (Match lane in matches_lane)
+                            CpPosition = String.Concat(CpPosition, String.Concat(" ", lane.Value));
+                    }
+                }
+                return (CpName, CpNameEn, CpUri, CpPosition);
             })
             .ToList();
         }
@@ -122,5 +138,5 @@ namespace LineBotCrawler
     }
 }
 /*
- (?<=data-champion-name="")([^""]*)[\s\S]*?(?<=data-champion-key="")([^""]*)[\s\S]*?(?<=href="")([^""]*)
+ (?<=data-champion-name=")([^"]*)[\s\S]*?(?<=data-champion-key=")([^"]*)[\s\S]*?(?<=href=")([^"]*)[\s\S]*?champion-index__champion-item__positions"><div class="champion-index__champion-item__position">(.*?)<\/a>
  */
