@@ -101,8 +101,7 @@ namespace LineBotCrawler
         {
             httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh_TW,zh;q=0.9");
             var html = await httpClient.GetStringAsync(url);
-
-            // ""><i) 抓取URL
+            
             var matches = Regex.Matches(html, @"(?<=data-champion-name="")([^""]*)[\s\S]*?(?<=data-champion-key="")([^""]*)([\s\S]*?)(?=<\/div><\/div)");
             return matches.ToList().Select(it =>
             {
@@ -120,11 +119,16 @@ namespace LineBotCrawler
                 }
                 else
                 {
-                    MatchCollection matches_uri = Regex.Matches(it.Groups[3].Value, @"(?<=href="")([^""]*)[\s\S]*?(?<=champion-index__champion-item__positions"">)([\s\S]*)?");                    
-                    CpUri = matches_uri[0].Value;
-                    MatchCollection matches_lane = Regex.Matches(matches_uri[1].Value, @"(?<=span>)([\u4E00-\u9FFF]+)");
-                    foreach (Match lane in matches_lane)
-                        CpPosition = String.Concat(CpPosition, String.Concat(" ", lane.Value));                    
+                    MatchCollection matches_uri = Regex.Matches(it.Groups[3].Value, @"(?<=href="")([^""]*)[\s\S]*?(?<=champion-index__champion-item__positions"">)([\s\S]*)?");
+                    foreach (Match uri in matches_uri)
+                    {
+                        GroupCollection uri_groups = uri.Groups;
+                        CpUri = String.Concat("http://www.op.gg", uri_groups[1]);
+
+                        MatchCollection matches_lane = Regex.Matches(uri_groups[2].Value, @"(?<=span>)([\u4E00-\u9FFF]+)");
+                        foreach (Match lane in matches_lane)
+                            CpPosition = String.Concat(CpPosition, String.Concat(" ", lane.Value));
+                    }
                 }
                 return (CpName, CpNameEn, CpUri, CpPosition);
             })
