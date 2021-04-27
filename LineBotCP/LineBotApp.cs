@@ -47,7 +47,7 @@ namespace LineBotCP
                                 {
                                     CpName = $"{match.Value}",
                                     CpNameEn = "Test",
-                                    CpUrl = "http://test",
+                                    CpUri = "http://test",
                                     CpPosition = "上路"
                                 };
                                 _db.ChampionState.Add(championState);
