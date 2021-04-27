@@ -120,15 +120,11 @@ namespace LineBotCrawler
                 }
                 else
                 {
-                    MatchCollection matches_uri = Regex.Matches(it.Groups[3].Value, @"(?<=href="")([^""]*)[\s\S]*?(?<=champion-index__champion-item__positions"">)([\s\S]*)?");
-                    foreach (Match uri in matches_uri)
-                    {
-                        GroupCollection groups = uri.Groups;
-                        CpUri = groups[1].Value;
-                        MatchCollection matches_lane = Regex.Matches(groups[2].Value, @"(?<=span>)([\u4E00-\u9FFF]+)");
-                        foreach (Match lane in matches_lane)
-                            CpPosition = String.Concat(CpPosition, String.Concat(" ", lane.Value));
-                    }
+                    MatchCollection matches_uri = Regex.Matches(it.Groups[3].Value, @"(?<=href="")([^""]*)[\s\S]*?(?<=champion-index__champion-item__positions"">)([\s\S]*)?");                    
+                    CpUri = matches_uri[0].Value;
+                    MatchCollection matches_lane = Regex.Matches(matches_uri[1].Value, @"(?<=span>)([\u4E00-\u9FFF]+)");
+                    foreach (Match lane in matches_lane)
+                        CpPosition = String.Concat(CpPosition, String.Concat(" ", lane.Value));                    
                 }
                 return (CpName, CpNameEn, CpUri, CpPosition);
             })
