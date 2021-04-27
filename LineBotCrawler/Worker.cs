@@ -112,7 +112,7 @@ namespace LineBotCrawler
 
                 MatchCollection matches_rip = Regex.Matches(it.Groups[3].Value, @"(?<=icon-)([^@]*)?");
 
-                if(matches_rip[0].Value.Equals("rip"))
+                if(matches_rip.Count != 0)
                 {
                     CpUri = "No Data";
                     CpPosition = "No Data";
