@@ -111,9 +111,9 @@ namespace LineBotCrawler
                 var CpUri = "";
                 var CpPosition = "";
 
-                MatchCollection matches_rip = Regex.Matches(it.Groups[3].Value, @"(?<=alt="")([^""]*)?");
+                MatchCollection matches_rip = Regex.Matches(it.Groups[3].Value, @"(?<=icon-)([^@]*)?");
 
-                if(matches_rip[0].Value == "R.I.P")
+                if(matches_rip[0].Value.Equals("rip"))
                 {
                     CpUri = "No Data";
                     CpPosition = "No Data";
