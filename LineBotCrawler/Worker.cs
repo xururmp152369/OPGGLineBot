@@ -101,7 +101,7 @@ namespace LineBotCrawler
         {
             var response = await httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
-            response.Content.Headers.ContentType.CharSet = "zh-TW";
+            response.Content.Headers.ContentType.CharSet = "zh_TW";
             var html = await response.Content.ReadAsStringAsync();
 
             // ""><i) 抓取URL
