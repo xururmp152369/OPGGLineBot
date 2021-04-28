@@ -100,7 +100,9 @@ namespace LineBotCrawler
         private async Task<List<(string CpName, string CpNameEn, string CpUri, string CpPosition)>> GetCpInfo(HttpClient httpClient, string url)
         {
             httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");
             httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7");
+            httpClient.DefaultRequestHeaders.Add("Cookie", "customLocale=zh_TW");
             var html = await httpClient.GetStringAsync(url);
             
             var matches = Regex.Matches(html, @"(?<=data-champion-name="")([^""]*)[\s\S]*?(?<=data-champion-key="")([^""]*)([\s\S]*?)(?=<\/div><\/div)");
