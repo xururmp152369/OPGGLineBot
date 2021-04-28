@@ -99,6 +99,7 @@ namespace LineBotCrawler
 
         private async Task<List<(string CpName, string CpNameEn, string CpUri, string CpPosition)>> GetCpInfo(HttpClient httpClient, string url)
         {
+            httpClient.DefaultRequestHeaders.Clear();
             httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh_TW,zh;q=1.0");
             var html = await httpClient.GetStringAsync(url);
             
