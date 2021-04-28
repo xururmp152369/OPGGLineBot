@@ -5,6 +5,7 @@ using Line.Messaging.Webhooks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -42,37 +43,43 @@ namespace LineBotCP
                             var match = regex.Match(textMessage.Text);
                             if (match.Success)
                             {
-                                //新增一筆資料
-                                var championState = new ChampionState
-                                {
-                                    CpName = $"{match.Value}",
-                                    CpNameEn = "Test",
-                                    CpUri = "http://test",
-                                    CpPosition = "上路"
-                                };
-                                _db.ChampionState.Add(championState);
-                                await _db.SaveChangesAsync();
+                                ////新增一筆資料
+                                //var championState = new ChampionState
+                                //{
+                                //    CpName = $"{match.Value}",
+                                //    CpNameEn = "Test",
+                                //    CpUri = "http://test",
+                                //    CpPosition = "上路"
+                                //};
+                                //_db.ChampionState.Add(championState);
+                                //await _db.SaveChangesAsync();
 
-                                //回傳訊息
-                                result = new List<ISendMessage>
-                                {
-                                    new TextMessage("新增成功!!")
-                                };
-                                break;
+                                ////回傳訊息
+                                //result = new List<ISendMessage>
+                                //{
+                                //    new TextMessage("新增成功!!")
+                                //};
+                                //break;
                             }
                         }
                         //當使用者輸入查詢時
                         {
-                            var regex = new Regex(@"^查詢[\s]*$", RegexOptions.IgnoreCase);
-                            if (regex.IsMatch(textMessage.Text))
+                            var regex = new Regex(@"(?<=查詢[\s])([\S]*)", RegexOptions.IgnoreCase);
+                            var match = regex.Match(textMessage.Text);
+                            if (match.Success)
                             {
                                 //取得第一筆資料
-                                var championState = await _db.ChampionState.FirstOrDefaultAsync();
+                                var championState = await _db.ChampionState
+                                    .Where(it => it.CpName == match.Value)
+                                    .FirstOrDefaultAsync();
 
                                 //回傳訊息
                                 result = new List<ISendMessage>
                                 {
-                                    new TextMessage(JsonConvert.SerializeObject(championState))
+                                    new TextMessage(
+                                        "查詢的英雄名為: " + championState.CpName
+                                        + "\n查詢的英雄英文名為: " + championState.CpNameEn
+                                        + "\n推薦位置為: " + championState.CpPosition)
                                 };
                                 break;
                             }
