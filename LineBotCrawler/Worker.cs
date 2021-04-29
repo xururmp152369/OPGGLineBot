@@ -141,7 +141,7 @@ namespace LineBotCrawler
                                 championTop.CpBoot2 = TopCpDetail.CpBoot2;
                                 championTop.CpRune = TopCpDetail.CpRune;
                             }
-                            Console.WriteLine("上路 OK");
+                            Console.WriteLine("top OK");
                             break;
                         case "中路":
                             var MidCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/mid"));
@@ -181,7 +181,7 @@ namespace LineBotCrawler
                                 championMid.CpBoot2 = MidCpDetail.CpBoot2;
                                 championMid.CpRune = MidCpDetail.CpRune;
                             }
-                            Console.WriteLine("中路 OK");
+                            Console.WriteLine("mid OK");
                             break;
                         case "下路":
                             var AdcCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/bot"));
@@ -245,7 +245,6 @@ namespace LineBotCrawler
                                 };
                                 _db.ChampionSupInfos.Add(championSup);
                                 ChampionSupDictionary.Add(championSup.CpName, championSup);
-                                Console.WriteLine("Sup OK");
                             }
                             //更新
                             else
@@ -262,7 +261,7 @@ namespace LineBotCrawler
                                 championSup.CpBoot2 = SupCpDetail.CpBoot2;
                                 championSup.CpRune = SupCpDetail.CpRune;;
                             }
-                            Console.WriteLine("Sup OK");
+                            Console.WriteLine("Support OK");
                             break;
                         case "打野":
                             var JunCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/jungle"));
@@ -302,10 +301,10 @@ namespace LineBotCrawler
                                 championJun.CpBoot2 = JunCpDetail.CpBoot2;
                                 championJun.CpRune = JunCpDetail.CpRune;
                             }
-                            Console.WriteLine("打野 OK");
+                            Console.WriteLine("jungle OK");
                             break;
                         default:
-                            Console.WriteLine("隨便");
+                            Console.WriteLine("else");
                             break;
                     }
                 }
@@ -373,6 +372,7 @@ namespace LineBotCrawler
                 GroupCollection lv1_groups = lv1.Groups;
                 CpLane = lv1_groups[1].Value; CpName = lv1_groups[2].Value; CpTier = lv1_groups[3].Value;
             }
+            Console.WriteLine("lv1 success");
             //SummonerSkill
             var CpSummonerSkill = "";
             MatchCollection matches_lv2_split = Regex.Matches(html, @"推薦召喚師法術([\s\S]*?)(?=<\/tbody)");
@@ -383,6 +383,7 @@ namespace LineBotCrawler
                 CpSummonerSkill = lv2_groups[1].Value + " + " + lv2_groups[2] + "   使用率:" + lv2_groups[3];
                 break;
             }
+            Console.WriteLine("lv2 success");
             //Skill
             var CpSkill = "";
             MatchCollection matches_lv3_split = Regex.Matches(html, @"推薦殺戮構建([\s\S]*?)(?=overview__table)");
@@ -392,6 +393,7 @@ namespace LineBotCrawler
                 GroupCollection lv3_groups = lv3.Groups;
                 CpSkill = lv3_groups[1].Value + " > " + lv3_groups[2] + " > " + lv3_groups[3] + "   使用率:" + lv3_groups[4];
             }
+            Console.WriteLine("lv3 success");
             //StartItem CoreItem Boot
             var CpStartItem = ""; var CpCoreItem1 = ""; var CpCoreItem2 = ""; var CpBoot1 = ""; var CpBoot2 = "";
             MatchCollection matches_lv4_split = Regex.Matches(html, @"推薦Item構建([\s\S]*?)(?=<\/tbody)");
@@ -405,6 +407,7 @@ namespace LineBotCrawler
                 CpBoot1 = lv4_groups[12].Value + "   使用率:" + lv4_groups[13];
                 CpBoot2 = lv4_groups[14].Value + "   使用率:" + lv4_groups[15];
             }
+            Console.WriteLine("lv4 success");
             //Rune
             var CpRune = "";
             MatchCollection matches_lv5_split = Regex.Matches(html, @"tabItem ChampionKeystoneRune-1([\s\S]*?)(?=<\/tbody)");
@@ -414,6 +417,7 @@ namespace LineBotCrawler
                 GroupCollection lv5_groups = lv5.Groups;
                 CpRune = lv5_groups[1] + " + " + lv5_groups[2] + " + " + lv5_groups[3] + " + " + lv5_groups[4] + " + " + lv5_groups[5] + " + " + lv5_groups[6] + "   使用率:" + lv5_groups[7];
             }
+            Console.WriteLine("lv5 success");
             return (CpLane, CpName, CpTier, CpSummonerSkill, CpSkill, CpStartItem, CpCoreItem1, CpCoreItem2, CpBoot1, CpBoot2, CpRune);
         }
     }
