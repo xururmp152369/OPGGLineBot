@@ -366,7 +366,7 @@ namespace LineBotCrawler
             Console.WriteLine("func success");
             //Lane Name Tier
             var CpLane = ""; var CpName = ""; var CpTier = "";
-            MatchCollection matches_lv1 = Regex.Matches(html, @"(?<=champion-stats-header__position--active)[\s\S]*?([\u4E00-\u9FFF]+)[\s\S]*?(?<=info__name"" >)([^<] +)[\s\S]*? (?<=< b >)([^<] +)");
+            MatchCollection matches_lv1 = Regex.Matches(html, @"(?<=champion-stats-header__position--active)[\s\S]*?([\u4E00-\u9FFF]+)[\s\S]*?(?<=info__name"">)([^<]+)[\s\S]*?(?<=<b>)([^<]+)");
             foreach(Match lv1 in matches_lv1)
             {
                 GroupCollection lv1_groups = lv1.Groups;
