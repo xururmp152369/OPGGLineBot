@@ -262,7 +262,7 @@ namespace LineBotCrawler
                                 championSup.CpBoot2 = SupCpDetail.CpBoot2;
                                 championSup.CpRune = SupCpDetail.CpRune;;
                             }
-                            onsole.WriteLine("Sup OK")l
+                            Console.WriteLine("Sup OK");
                             break;
                         case "打野":
                             var JunCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/jungle"));
