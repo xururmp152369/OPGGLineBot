@@ -50,40 +50,40 @@ namespace LineBotCrawler
             using var httpClient = new HttpClient();
 
             //從 DB 取得所有英雄名稱
-            var ChampionStateDictionary = await _db.ChampionState
-                //.Where(it => it.ITHomeId == iTHome.Id)
-                .ToDictionaryAsync(it => it.CpName);
+            //var ChampionStateDictionary = await _db.ChampionState
+            //    //.Where(it => it.ITHomeId == iTHome.Id)
+            //    .ToDictionaryAsync(it => it.CpName);
 
-            var CpInfo = await GetCpInfo(httpClient, OPGG_CP_Info_url);
-            foreach(var cpState in CpInfo)
-            {
-                var championState = ChampionStateDictionary.ContainsKey(cpState.CpName)
-                    ? ChampionStateDictionary[cpState.CpName] : null;
-                //新增
-                if (championState == null)
-                {
-                    championState = new ChampionState
-                    {
-                        CpName = cpState.CpName,
-                        CpNameEn = cpState.CpNameEn,
-                        CpPosition = cpState.CpPosition,
-                        CpUri = cpState.CpUri
-                    };
-                    _db.ChampionState.Add(championState);
-                    ChampionStateDictionary.Add(championState.CpName, championState);
-                    Console.WriteLine("insert success");
-                }
-                //更新
-                else
-                {
-                    championState.CpName = cpState.CpName;
-                    championState.CpNameEn = cpState.CpNameEn;
-                    championState.CpPosition = cpState.CpPosition;
-                    championState.CpUri = cpState.CpUri;
-                    Console.WriteLine("update success");
-                }
-            }
-            await _db.SaveChangesAsync();
+            //var CpInfo = await GetCpInfo(httpClient, OPGG_CP_Info_url);
+            //foreach(var cpState in CpInfo)
+            //{
+            //    var championState = ChampionStateDictionary.ContainsKey(cpState.CpName)
+            //        ? ChampionStateDictionary[cpState.CpName] : null;
+            //    //新增
+            //    if (championState == null)
+            //    {
+            //        championState = new ChampionState
+            //        {
+            //            CpName = cpState.CpName,
+            //            CpNameEn = cpState.CpNameEn,
+            //            CpPosition = cpState.CpPosition,
+            //            CpUri = cpState.CpUri
+            //        };
+            //        _db.ChampionState.Add(championState);
+            //        ChampionStateDictionary.Add(championState.CpName, championState);
+            //        Console.WriteLine("insert success");
+            //    }
+            //    //更新
+            //    else
+            //    {
+            //        championState.CpName = cpState.CpName;
+            //        championState.CpNameEn = cpState.CpNameEn;
+            //        championState.CpPosition = cpState.CpPosition;
+            //        championState.CpUri = cpState.CpUri;
+            //        Console.WriteLine("update success");
+            //    }
+            //}
+            //await _db.SaveChangesAsync();
 
             //------------------------以上為新增英雄基本資訊---------------------
             //-----------------已下為新增個別英雄對應路線詳細資訊----------------
@@ -99,6 +99,7 @@ namespace LineBotCrawler
             foreach (var cpState in ChampionDictionary)
             {
                 string[] strsub = cpState.CpPosition.Split(' ');
+                Console.WriteLine("insert success");
                 foreach (var str in strsub)
                 {
                     switch (str)
@@ -141,7 +142,6 @@ namespace LineBotCrawler
                                 championTop.CpBoot2 = TopCpDetail.CpBoot2;
                                 championTop.CpRune = TopCpDetail.CpRune;
                             }
-                            await _db.SaveChangesAsync();
                             break;
                         case "中路":
                             var MidCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/mid"));
@@ -181,7 +181,6 @@ namespace LineBotCrawler
                                 championMid.CpBoot2 = MidCpDetail.CpBoot2;
                                 championMid.CpRune = MidCpDetail.CpRune;
                             }
-                            await _db.SaveChangesAsync();
                             break;
                         case "下路":
                             var AdcCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/bot"));
@@ -221,7 +220,6 @@ namespace LineBotCrawler
                                 championAdc.CpBoot2 = AdcCpDetail.CpBoot2;
                                 championAdc.CpRune = AdcCpDetail.CpRune;
                             }
-                            await _db.SaveChangesAsync();
                             break;
                         case "輔助":
                             var SupCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/support"));
@@ -261,7 +259,6 @@ namespace LineBotCrawler
                                 championSup.CpBoot2 = SupCpDetail.CpBoot2;
                                 championSup.CpRune = SupCpDetail.CpRune;
                             }
-                            await _db.SaveChangesAsync();
                             break;
                         case "打野":
                             var JunCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/jungle"));
@@ -301,12 +298,12 @@ namespace LineBotCrawler
                                 championJun.CpBoot2 = JunCpDetail.CpBoot2;
                                 championJun.CpRune = JunCpDetail.CpRune;
                             }
-                            await _db.SaveChangesAsync();
                             break;
                         default:
                             break;
                     }
                 }
+                await _db.SaveChangesAsync();
             }
         }
 
@@ -351,7 +348,7 @@ namespace LineBotCrawler
             })
             .ToList();
         }
-
+        //爬蟲--爬取英雄各路線詳細資訊至路線資料表
         private async Task<(string CpLane, string CpName, string CpTier, string CpSummonerSkill, string CpSkill, string CpStartItem,
             string CpCoreItem1, string CpCoreItem2, string CpBoot1, string CpBoot2, string CpRune)> GetCpDetail(HttpClient httpClient, string url)
         {
@@ -361,6 +358,7 @@ namespace LineBotCrawler
             httpClient.DefaultRequestHeaders.Add("Cookie", "customLocale=zh_TW");
             
             var html = await httpClient.GetStringAsync(url);
+            Console.WriteLine("func success");
             //Lane Name Tier
             var CpLane = ""; var CpName = ""; var CpTier = "";
             MatchCollection matches_lv1 = Regex.Matches(html, @"(?<=champion-stats-header__position--active)[\s\S]*?([\u4E00-\u9FFF]+)[\s\S]*?(?<=info__name"" >)([^<] +)[\s\S]*? (?<=< b >)([^<] +)");
