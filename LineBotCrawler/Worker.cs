@@ -99,7 +99,6 @@ namespace LineBotCrawler
             foreach (var cpState in ChampionDictionary)
             {
                 string[] strsub = cpState.CpPosition.Split(' ');
-                Console.WriteLine("insert success");
                 foreach (var str in strsub)
                 {
                     switch (str)
@@ -142,6 +141,7 @@ namespace LineBotCrawler
                                 championTop.CpBoot2 = TopCpDetail.CpBoot2;
                                 championTop.CpRune = TopCpDetail.CpRune;
                             }
+                            Console.WriteLine("上路 OK");
                             break;
                         case "中路":
                             var MidCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/mid"));
@@ -181,6 +181,7 @@ namespace LineBotCrawler
                                 championMid.CpBoot2 = MidCpDetail.CpBoot2;
                                 championMid.CpRune = MidCpDetail.CpRune;
                             }
+                            Console.WriteLine("中路 OK");
                             break;
                         case "下路":
                             var AdcCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/bot"));
@@ -220,6 +221,7 @@ namespace LineBotCrawler
                                 championAdc.CpBoot2 = AdcCpDetail.CpBoot2;
                                 championAdc.CpRune = AdcCpDetail.CpRune;
                             }
+                            Console.WriteLine("ADC OK");
                             break;
                         case "輔助":
                             var SupCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/support"));
@@ -243,6 +245,7 @@ namespace LineBotCrawler
                                 };
                                 _db.ChampionSupInfos.Add(championSup);
                                 ChampionSupDictionary.Add(championSup.CpName, championSup);
+                                Console.WriteLine("Sup OK");
                             }
                             //更新
                             else
@@ -257,8 +260,9 @@ namespace LineBotCrawler
                                 championSup.CpCoreItem2 = SupCpDetail.CpCoreItem2;
                                 championSup.CpBoot1 = SupCpDetail.CpBoot1;
                                 championSup.CpBoot2 = SupCpDetail.CpBoot2;
-                                championSup.CpRune = SupCpDetail.CpRune;
+                                championSup.CpRune = SupCpDetail.CpRune;;
                             }
+                            onsole.WriteLine("Sup OK")l
                             break;
                         case "打野":
                             var JunCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/jungle"));
@@ -298,8 +302,10 @@ namespace LineBotCrawler
                                 championJun.CpBoot2 = JunCpDetail.CpBoot2;
                                 championJun.CpRune = JunCpDetail.CpRune;
                             }
+                            Console.WriteLine("打野 OK");
                             break;
                         default:
+                            Console.WriteLine("隨便");
                             break;
                     }
                 }
