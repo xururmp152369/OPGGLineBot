@@ -50,40 +50,40 @@ namespace LineBotCrawler
             using var httpClient = new HttpClient();
 
             //從 DB 取得所有英雄名稱
-            //var ChampionStateDictionary = await _db.ChampionState
-            //    //.Where(it => it.ITHomeId == iTHome.Id)
-            //    .ToDictionaryAsync(it => it.CpName);
+            var ChampionStateDictionary = await _db.ChampionState
+                //.Where(it => it.ITHomeId == iTHome.Id)
+                .ToDictionaryAsync(it => it.CpName);
 
-            //var CpInfo = await GetCpInfo(httpClient, OPGG_CP_Info_url);
-            //foreach(var cpState in CpInfo)
-            //{
-            //    var championState = ChampionStateDictionary.ContainsKey(cpState.CpName)
-            //        ? ChampionStateDictionary[cpState.CpName] : null;
-            //    //新增
-            //    if (championState == null)
-            //    {
-            //        championState = new ChampionState
-            //        {
-            //            CpName = cpState.CpName,
-            //            CpNameEn = cpState.CpNameEn,
-            //            CpPosition = cpState.CpPosition,
-            //            CpUri = cpState.CpUri
-            //        };
-            //        _db.ChampionState.Add(championState);
-            //        ChampionStateDictionary.Add(championState.CpName, championState);
-            //        Console.WriteLine("insert success");
-            //    }
-            //    //更新
-            //    else
-            //    {
-            //        championState.CpName = cpState.CpName;
-            //        championState.CpNameEn = cpState.CpNameEn;
-            //        championState.CpPosition = cpState.CpPosition;
-            //        championState.CpUri = cpState.CpUri;
-            //        Console.WriteLine("update success");
-            //    }
-            //}
-            //await _db.SaveChangesAsync();
+            var CpInfo = await GetCpInfo(httpClient, OPGG_CP_Info_url);
+            foreach (var cpState in CpInfo)
+            {
+                var championState = ChampionStateDictionary.ContainsKey(cpState.CpName)
+                    ? ChampionStateDictionary[cpState.CpName] : null;
+                //新增
+                if (championState == null)
+                {
+                    championState = new ChampionState
+                    {
+                        CpName = cpState.CpName,
+                        CpNameEn = cpState.CpNameEn,
+                        CpPosition = cpState.CpPosition,
+                        CpUri = cpState.CpUri
+                    };
+                    _db.ChampionState.Add(championState);
+                    ChampionStateDictionary.Add(championState.CpName, championState);
+                    Console.WriteLine("insert success");
+                }
+                //更新
+                else
+                {
+                    championState.CpName = cpState.CpName;
+                    championState.CpNameEn = cpState.CpNameEn;
+                    championState.CpPosition = cpState.CpPosition;
+                    championState.CpUri = cpState.CpUri;
+                    Console.WriteLine("update success");
+                }
+            }
+            await _db.SaveChangesAsync();
 
             //------------------------以上為新增英雄基本資訊---------------------
             //-----------------已下為新增個別英雄對應路線詳細資訊----------------
@@ -185,7 +185,7 @@ namespace LineBotCrawler
                             break;
                         case "下路":
                             var AdcCpDetail = await GetCpDetail(httpClient, String.Concat(cpState.CpUri, "/bot"));
-                            var championAdc = ChampionMidDictionary.ContainsKey(cpState.CpName) ? ChampionAdcDictionary[cpState.CpName] : null;
+                            var championAdc = ChampionAdcDictionary.ContainsKey(cpState.CpName) ? ChampionAdcDictionary[cpState.CpName] : null;
                             //新增
                             if (championAdc == null)
                             {
@@ -309,6 +309,7 @@ namespace LineBotCrawler
                     }
                 }
                 await _db.SaveChangesAsync();
+                Thread.Sleep(100);
             }
         }
 
@@ -376,7 +377,7 @@ namespace LineBotCrawler
             //SummonerSkill
             var CpSummonerSkill = "";
             MatchCollection matches_lv2_split = Regex.Matches(html, @"推薦召喚師法術([\s\S]*?)(?=<\/tbody)");
-            MatchCollection matches_lv2 = Regex.Matches(matches_lv2_split[0].Value, @"(?<=#ffc659'>)([^<]+)[\s\S]*?(?<=#ffc659'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)");
+            MatchCollection matches_lv2 = Regex.Matches(matches_lv2_split[0].Value, @"(?<=#ffc659&#039;&gt;)([^&]+)[\s\S]*?(?<=#ffc659&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)");
             foreach(Match lv2 in matches_lv2)
             {
                 GroupCollection lv2_groups = lv2.Groups;
@@ -397,7 +398,7 @@ namespace LineBotCrawler
             //StartItem CoreItem Boot
             var CpStartItem = ""; var CpCoreItem1 = ""; var CpCoreItem2 = ""; var CpBoot1 = ""; var CpBoot2 = "";
             MatchCollection matches_lv4_split = Regex.Matches(html, @"推薦Item構建([\s\S]*?)(?=<\/tbody)");
-            MatchCollection matches_lv4 = Regex.Matches(matches_lv4_split[0].Value, @"(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?推薦構建[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?鞋[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)");
+            MatchCollection matches_lv4 = Regex.Matches(matches_lv4_split[0].Value, @"(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?推薦構建[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?鞋[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)");
             foreach(Match lv4 in matches_lv4)
             {
                 GroupCollection lv4_groups = lv4.Groups;
