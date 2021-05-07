@@ -36,7 +36,7 @@ namespace LineBotCP
                         //使用者Id
                         var userId = ev.Source.UserId;
                         
-                        //當使用者輸入查詢時（名稱）
+                        //當使用者輸入：查詢時（名稱）
                         {
                             var regex = new Regex(@"(?<=查詢[\s])([\S]*)", RegexOptions.IgnoreCase);
                             var match = regex.Match(textMessage.Text);
@@ -58,7 +58,7 @@ namespace LineBotCP
                                 break;
                             }
                         }
-                        //當使用者輸入查詢（路線 名稱）
+                        //當使用者輸入：詳細（路線 名稱）
                         {
                             var regex = new Regex(@"(?<=詳細)[\s]*?([\S]+)[\s]*?([\S]+)", RegexOptions.IgnoreCase);
                             MatchCollection match = regex.Matches(textMessage.Text);
@@ -170,6 +170,10 @@ namespace LineBotCP
                                         break;
                                 }
                             }
+                        }
+                        //當使用者輸入：英雄介紹故事
+                        {
+
                         }
                     }
                     break;

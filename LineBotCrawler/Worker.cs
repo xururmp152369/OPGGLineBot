@@ -59,6 +59,8 @@ namespace LineBotCrawler
             {
                 var championState = ChampionStateDictionary.ContainsKey(cpState.CpName)
                     ? ChampionStateDictionary[cpState.CpName] : null;
+                var CpInfo2 = await GetCpInfo_2(httpClient, cpState.CpNameEn);
+
                 //新增
                 if (championState == null)
                 {
@@ -67,7 +69,9 @@ namespace LineBotCrawler
                         CpName = cpState.CpName,
                         CpNameEn = cpState.CpNameEn,
                         CpPosition = cpState.CpPosition,
-                        CpUri = cpState.CpUri
+                        CpUri = cpState.CpUri,
+                        CpIntroduce = CpInfo2.CpIntroduce,
+                        CpNickname = CpInfo2.CpNickname
                     };
                     _db.ChampionState.Add(championState);
                     ChampionStateDictionary.Add(championState.CpName, championState);
@@ -79,6 +83,8 @@ namespace LineBotCrawler
                     championState.CpNameEn = cpState.CpNameEn;
                     championState.CpPosition = cpState.CpPosition;
                     championState.CpUri = cpState.CpUri;
+                    championState.CpIntroduce = CpInfo2.CpIntroduce;
+                    championState.CpNickname = CpInfo2.CpNickname;
                 }
             }
             await _db.SaveChangesAsync();
@@ -319,7 +325,7 @@ namespace LineBotCrawler
             httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7");
             httpClient.DefaultRequestHeaders.Add("Cookie", "customLocale=zh_TW");
             var html = await httpClient.GetStringAsync(url);
-            
+
             var matches = Regex.Matches(html, @"(?<=data-champion-name="")([^""]*)[\s\S]*?(?<=data-champion-key="")([^""]*)([\s\S]*?)(?=<\/div><\/div)");
             return matches.ToList().Select(it =>
             {
@@ -327,10 +333,9 @@ namespace LineBotCrawler
                 var CpNameEn = it.Groups[2].Value;
                 var CpUri = "";
                 var CpPosition = "";
-
                 MatchCollection matches_rip = Regex.Matches(it.Groups[3].Value, @"(?<=icon-)([^@]*)?");
 
-                if(matches_rip.Count != 0)
+                if (matches_rip.Count != 0)
                 {
                     CpUri = "No Data";
                     CpPosition = "No Data";
@@ -348,9 +353,31 @@ namespace LineBotCrawler
                             CpPosition = String.Concat(CpPosition, String.Concat(" ", lane.Value));
                     }
                 }
+
                 return (CpName, CpNameEn, CpUri, CpPosition);
             })
             .ToList();
+        }
+        //爬蟲--爬取英雄基本資訊中的暱稱及介紹詞至championstate
+        private static async Task<(string CpNickname, string CpIntroduce)> GetCpInfo_2(HttpClient httpClient, string CpNameEn)
+        {
+            httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
+            httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7");
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
+            httpClient.DefaultRequestHeaders.Add("Cookie", "__cfduid=d5cc4178fff72d9fabe1cc05f72252d161620196655; osano_consentmanager_uuid=58d468a5-fd63-4f94-b682-8ddff7c7325f; osano_consentmanager=odidbuQ4_79p705fpUdviXPbmhF9uvdKZ9dO67WhnoikOa2shM8tZjGasKjrFRGyFAkAiP6DqC9aIpV57M9OLuZvs-iPGk3WhO0JGY1r40wuYjU8i8jX1XETErfyDclCwJWV_qjKx00kakHNtz5V6-jmkYVVQohhB_LRzAXdO94BeOxY2b6Fmv2DJpD73PLD2tRIV101eMUzh1GsJgpxLxxz8bNQlwzEo8uBjA==; osano_consentmanager_expdate=1652767026592; ping_session_id=926556da-4d15-4b88-9244-7ef9cc56cb20");
+            var html_other = await httpClient.GetStringAsync("https://universe.leagueoflegends.com/zh_TW/champion/" + CpNameEn + "/");
+            var CpNickname = "";var CpIntroduce = "";
+
+            MatchCollection matches_Introduce = Regex.Matches(html_other, @"(?<=og:description"" content="")([^""]+)");
+            foreach (Match res in matches_Introduce)
+            {
+                GroupCollection res_groups = res.Groups;
+                CpNickname = res_groups[1].Value;
+                //CpIntroduce = res_groups[2].Value;
+            }
+            Console.WriteLine(html_other + "OK");
+            return (CpNickname, CpIntroduce);
         }
         //爬蟲--爬取英雄各路線詳細資訊至路線資料表
         private static async Task<(string CpLane, string CpName, string CpTier, string CpSummonerSkill, string CpSkill, string CpStartItem,
@@ -360,12 +387,12 @@ namespace LineBotCrawler
             httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");
             httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7");
             httpClient.DefaultRequestHeaders.Add("Cookie", "customLocale=zh_TW");
-            
+
             var html = await httpClient.GetStringAsync(url);
             //Lane Name Tier
             var CpLane = ""; var CpName = ""; var CpTier = "";
             MatchCollection matches_lv1 = Regex.Matches(html, @"(?<=champion-stats-header__position--active)[\s\S]*?([\u4E00-\u9FFF]+)[\s\S]*?(?<=info__name"">)([^<]+)[\s\S]*?(?<=<b>)([^<]+)");
-            foreach(Match lv1 in matches_lv1)
+            foreach (Match lv1 in matches_lv1)
             {
                 GroupCollection lv1_groups = lv1.Groups;
                 CpLane = lv1_groups[1].Value; CpName = lv1_groups[2].Value; CpTier = lv1_groups[3].Value;
@@ -374,7 +401,7 @@ namespace LineBotCrawler
             var CpSummonerSkill = "";
             MatchCollection matches_lv2_split = Regex.Matches(html, @"推薦召喚師法術([\s\S]*?)(?=<\/tbody)");
             MatchCollection matches_lv2 = Regex.Matches(matches_lv2_split[0].Value, @"(?<=#ffc659&#039;&gt;)([^&]+)[\s\S]*?(?<=#ffc659&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)");
-            foreach(Match lv2 in matches_lv2)
+            foreach (Match lv2 in matches_lv2)
             {
                 GroupCollection lv2_groups = lv2.Groups;
                 CpSummonerSkill = lv2_groups[1].Value + " + " + lv2_groups[2] + "   使用率:" + lv2_groups[3];
@@ -384,7 +411,7 @@ namespace LineBotCrawler
             var CpSkill = "";
             MatchCollection matches_lv3_split = Regex.Matches(html, @"推薦殺戮構建([\s\S]*?)(?=overview__table)");
             MatchCollection matches_lv3 = Regex.Matches(matches_lv3_split[0].Value, @"(?<=alt=""""> <span>)([^<]?)[\s\S]*?(?<=alt=""""> <span>)([^<]?)[\s\S]*?(?<=alt=""""> <span>)([^<]?)[\s\S]*?(?<=strong>)(\d+.\d+%)");
-            foreach(Match lv3 in matches_lv3)
+            foreach (Match lv3 in matches_lv3)
             {
                 GroupCollection lv3_groups = lv3.Groups;
                 CpSkill = lv3_groups[1].Value + " > " + lv3_groups[2] + " > " + lv3_groups[3] + "   使用率:" + lv3_groups[4];
@@ -405,7 +432,7 @@ namespace LineBotCrawler
                     CpBoot2 = "此英雄無法購買";
                 }
             }
-            else 
+            else
             {
                 MatchCollection matches_lv4 = Regex.Matches(matches_lv4_split[0].Value, @"(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?推薦構建[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?鞋[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc&#039;&gt;)([^&]+)[\s\S]*?(?<=strong>)(\d+.\d+%)");
                 foreach (Match lv4 in matches_lv4)
@@ -422,7 +449,7 @@ namespace LineBotCrawler
             var CpRune = "";
             MatchCollection matches_lv5_split = Regex.Matches(html, @"tabItem ChampionKeystoneRune-1([\s\S]*?)(?=<\/tbody)");
             MatchCollection matches_lv5 = Regex.Matches(matches_lv5_split[0].Value, @"perk-page__item--active[\s\S]*?(?<=alt="")([^""]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt="")([^""]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt="")([^""]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt="")([^""]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt="")([^""]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt="")([^""]+)[\s\S]*?(?<=strong>)(\d+.\d+%)");
-            foreach(Match lv5 in matches_lv5)
+            foreach (Match lv5 in matches_lv5)
             {
                 GroupCollection lv5_groups = lv5.Groups;
                 CpRune = lv5_groups[1] + " + " + lv5_groups[2] + " + " + lv5_groups[3] + " + " + lv5_groups[4] + " + " + lv5_groups[5] + " + " + lv5_groups[6] + "   使用率:" + lv5_groups[7];
@@ -431,6 +458,3 @@ namespace LineBotCrawler
         }
     }
 }
-/*
- (?<=champion-stats-header__position--active)[\s\S]*?([\p{Han}]+)[\s\S]*?(?<=champion-stats__list__item)[\s\S]*?([\p{Han}]+)[\s\S]*?(?<=champion-stats__list__item)[\s\S]*?([\p{Han}]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=alt=""> <span>)([^<]?)[\s\S]*?(?<=alt=""> <span>)([^<]?)[\s\S]*?(?<=alt=""> <span>)([^<]?)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?推薦構建[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?鞋[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?(?<=#00cfbc'>)([^<]+)[\s\S]*?(?<=strong>)(\d+.\d+%)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt=")([^"]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt=")([^"]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt=")([^"]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt=")([^"]+)[\s\S]*?perk-page__item--active[\s\S]*?(?<=alt=")([^"]+)[\s\S]*?
- */

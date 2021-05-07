@@ -12,6 +12,8 @@ namespace LinBotDBClass.Models
         public string CpNameEn { get; set; }
         public string CpUri { get; set; }
         public string CpPosition { get; set; }
+        public string CpIntroduce { get; set; }
+        public string CpNickname { get; set; }
 
         public virtual ICollection<ChampionTopInfo> ChampionTopInfos { get; set; }
         public virtual ICollection<ChampionMidInfo> ChampionMidInfos { get; set; }
